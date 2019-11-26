@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>村庄分布图增加点击</title>
+    <script type="text/javascript" src="jquery.js"></script>
+    <style>
+        html,body{
+            margin: 0;
+            padding: 0;
+        }
+        .container{
+            width: 1200px;
+            height: 80vh;
+            overflow: hidden;
+            margin: 5vh auto;
+            border: 1px solid #ff0000;
+        }
+        #demoImg{
+            position: absolute;
+            cursor:move;
+            width: 1200px;
+        }
+        .marker{
+            position: absolute;
+            width: 25px;
+            cursor: pointer;
+            opacity: 0.3;
+        }
+        .marker:hover{
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+<div class="container" style="position: relative">
+    <div>加载中。。。</div>
+</div>
+<script type="text/javascript">
+    var dataList ={
+        o_width: 2648,
+        data: [
+            {left: 1380,top: 965,name: '李令春'},
+            {left: 747,top: 577,name: '马长祥'},
+            {left: 1775,top: 740,name: '马天祥'},
+            {left: 1500,top: 1415,name: '李绪民'},
+            {left: 1030,top: 1527,name: '李春华'},
+            {left: 1265,top: 1527,name: '王吉祥'},
+            {left: 1775,top: 1415,name: '王子绪'},
+            {left: 1500,top: 1190,name: '李令义'},
+            {left: 1775,top: 1190,name: '王玉仙'},
+            {left: 2125,top: 690,name: '马会祥'},
+            {left: 2013,top: 1250,name: '王会民'},
+            {left: 2475,top: 910,name: '王金兰'},
+            {left: 1265,top: 630,name: '马德成'},
+            {left: 2243,top: 855,name: '王会忠'},
+            {left: 1265,top: 1360,name: '王志远'},
+            {left: 2243,top: 740,name: '马德昌'},
+            {left: 1895,top: 910,name: '王维东'},
+            {left: 1610,top: 1075,name: '李志祥'},
+            {left: 1150,top: 1470,name: '王泽远'},
+            {left: 1775,top: 1075,name: '王会青'},
+            {left: 2013,top: 1415,name: '王金见'},
+        ]
+    }
+    $(function() {
+        // 村庄分布图的当前宽
+        initImg('images/demo.jpeg')
+    })
+
+    function initImg(url) {
+        $('.container').text('')
+        $('.container').append('<img src="' + url + '" id="demoImg" onmousewheel="return bbimg(this)" />')
+        for (var i = 0;i < dataList.data.length;i ++) {
+            var imgLeft = dataList.data[i].left * $('#demoImg').width() / dataList.o_width
+            var imgTop = dataList.data[i].top * $('#demoImg').width() / dataList.o_width
+            $('.container').append('<img src="images/showMore.png" class="marker" style="left:'
+                + imgLeft + 'px;top: ' + imgTop + 'px;" onclick="showDetail('+ i +')">')
+        }
+
+        var imgDemo = document.getElementById('demoImg')
+        imgDemo.onmousedown = function(event) {
+            event.preventDefault();
+            /*再次点击时使得图标任然在那个位置，鼠标可以点击到图标上*/
+            var ol = event.clientX -imgDemo.offsetLeft;
+            var ot = event.clientY - imgDemo.offsetTop;
+
+            document.onmousemove = function (event) {
+                var left = event.clientX - ol;
+                var top = event.clientY - ot;
+                imgDemo.style.left = left+"px";/*赋值*/
+                imgDemo.style.top = top+"px";
+                changeMarker($('.marker'),$('#demoImg')[0].style.left, $('#demoImg')[0].style.top,  $('#demoImg').width())
+            }
+            /*鼠标松开*/
+            document.onmouseup = function (event) {
+                document.onmousemove = null;
+                document.onmouseup = null;
+            }
+        }
+    }
+    function changeMarker(o, imgLeft, imgTop, imgWidth, markSize) {
+        for (var i = 0;i < o.length;i ++) {
+            o[i].style.left = dataList.data[i].left * imgWidth / dataList.o_width + parseInt(imgLeft) + 'px'
+            o[i].style.top = dataList.data[i].top * imgWidth / dataList.o_width + parseInt(imgTop) + 'px'
+            o[i].style.width = 5 + 40 * imgWidth / dataList.o_width + 'px'
+        }
+    }
+    function bbimg() {
+        var currentWidth = $('#demoImg').width()
+        var a = event.wheelDelta
+        if ($('#demoImg')[0].style.left) {
+            $('#demoImg').width(currentWidth + a)
+            $('#demoImg')[0].style.left = parseInt($('#demoImg')[0].style.left) - a / 2 + 'px'
+            $('#demoImg')[0].style.top = parseInt($('#demoImg')[0].style.top) - a / 3 + 'px'
+            changeMarker($('.marker'), $('#demoImg')[0].style.left, $('#demoImg')[0].style.top,  $('#demoImg').width())
+        } else {
+            $('#demoImg').width(currentWidth + a)
+            $('#demoImg')[0].style.left = 0 - a / 2 + 'px'
+            $('#demoImg')[0].style.top =  0 - a / 2 + 'px'
+            changeMarker($('.marker'), $('#demoImg')[0].style.left, $('#demoImg')[0].style.top,  $('#demoImg').width())
+        }
+
+    }
+    function showDetail(index) {
+        alert(dataList.data[index].name)
+    }
+</script>
+</body>
+</html>
